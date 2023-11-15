@@ -25,10 +25,11 @@ app.get("/tokenPrice", async (req, res) => {
 
   const usdPrices = {
     tokenOne: responseOne.raw.usdPrice,
-    tokenTwo: responseTwo.raw.usdPrice, 
+
+    tokenTwo: responseTwo.raw.usdPrice,
     ratio: responseOne.raw.usdPrice/responseTwo.raw.usdPrice
   }
-
+  
   return res.status(200).json(usdPrices);
 });
 
