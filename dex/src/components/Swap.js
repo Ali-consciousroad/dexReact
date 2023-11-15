@@ -46,12 +46,7 @@ function Swap() {
     setChangeToken(asset);
     setIsOpen(true);
   }
-
-  function openModal(asset){
-    setChangeToken(asset);
-    setIsOpen(true);
-  }
-
+  
   function modifyToken(i){
     setPrices(null);
     setTokenOneAmount(null);
