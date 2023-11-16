@@ -1,6 +1,6 @@
 # Dex Starter Repo (Moralis Blueprint)
 
-Create a Dencentralized Echange using React and Moralis 
+Create a Dencentralized Exchange using React and Moralis 
 
 1. Install the backend and the frontend: $ npm install
 
