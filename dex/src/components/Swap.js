@@ -7,8 +7,10 @@ import {
 } from "@ant-design/icons";
 import tokenList from "../tokenList.json";
 import axios from "axios";
+import { useSendTransaction, useWaitForTransaction } from "wagmi";
 
-function Swap() {
+function Swap(props) {
+  const { address, isConnected } = props;
   const [slippage, setSlippage] = useState(2.5);
   const [tokenOneAmount, setTokenOneAmount] = useState(null);
   const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
@@ -17,6 +19,20 @@ function Swap() {
   const [isOpen, setIsOpen] = useState(false);
   const [changeToken, setChangeToken] = useState(1);
   const [prices, setPrices] = useState(null);
+  const [txDetails, setTxDetails] = useState({
+    to:null,
+    data: null,
+    value: null,
+  });
+
+  const {data, sendTransaction} = useSendTransaction({
+    request: {
+      from: address, 
+      to: String(txDetails.to),
+      data: String(txDetails.data),
+      value: String(txDetails.value),
+    }
+  })
 
   function handleSlippageChange(e){
     setSlippage(e.target.value);
@@ -66,13 +82,39 @@ function Swap() {
       params: {addressOne: one, addressTwo: two}
     })
 
-    console.log(res.data);
     setPrices(res.data);
+  }
+
+  async function fetchDexSwap() {
+    const allowance = await axios.get(`https://api.1inch.io/v5.2/1/approve/allowance?tokenAddress=${tokenOne.address}&walletAddress=${address}`)
+  
+    if(allowance.data.allowance === "0"){
+      const approve = await axios.get(`https//api.1inch.io/v5.2/1/approve/transaction?tokenAddress=${tokenOne.address}`)
+    
+      setTxDetails(approve.data);
+      console.log("not approved")
+      return
+    }
+
+    const tx = await axios.get(
+      `https://api.1inch.io/v5.2/1/swap?fromTokenAddress=${tokenOne.address}&toTokenAddress=${tokenTwo.address}&amount=${tokenOneAmount.padEnd(tokenOne.decimals+tokenOneAmount.length, '0')}&fromAddress=${address}&slippage=${slippage}`
+    )
+
+    let decimals = Number(`1E${tokenTwo.decimals}`)
+    setTokenTwoAmount((Number(tx.data.toTokenAmount)/decimals).toFixed(2));
+
+    setTxDetails(tx.data.tx);
   }
 
   useEffect(()=>{
     fetchPrices(tokenList[0].address, tokenList[1].address)
   },[])
+
+  useEffect(() =>{
+    if(txDetails.to && isConnected){
+      sendTransaction();
+    }
+  }, [txDetails])
   
   const settings = (
     <>
@@ -143,7 +185,7 @@ function Swap() {
             <DownOutlined /> 
             </div>
         </div>
-        <div className="swapButton" disabled={!tokenOneAmount}>Swap</div>
+        <div className="swapButton" disabled={!tokenOneAmount || !isConnected} onClick={fetchDexSwap}>Swap</div>
       </div>
     </>
   )
