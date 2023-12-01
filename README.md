@@ -10,7 +10,7 @@ Start the backend: $ node index.js
 
 Start the frontend: $ npm start
 
-A metamask account with coins in your wallet are needed to make the dex and swap functionality work
+A metamask account with coins in your wallet are needed to make the dex and swap functionality work.
 
 Full tutorial available here: 
 https://www.youtube.com/watch?v=t8U7GRrlYW8&pp=ygUTYnVpbGQgYSBkZXggbW9yYWxpcw%3D%3D
